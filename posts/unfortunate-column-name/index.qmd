@@ -1,0 +1,82 @@
+---
+title: ".data: an unfortunate name for a column"
+author: "Richard J. Telford"
+date: "2024-02-21"
+categories: [R, tidyverse]
+---
+
+A colleague came to ask for help today with some code that worked perfectly when run with base R, but failed with an impenetrable error when run through tidyverse.
+
+Here is a minimal example of the set up, a tibble with a column called .data
+
+```{r}
+#| message: false
+library(tidyverse)
+
+df <- tibble(a = LETTERS[1:5], .data = rnorm(5))
+df
+```
+
+.data is a legal name for a column according to R's rules for naming objects, and everything appears to be fine.
+
+What could possibly go wrong?
+Let's try filtering the column .data to keep just the positive values, first with base R.
+
+```{r}
+#| error: true
+
+df[df$.data > 0, ]
+```
+
+Perfect.
+And now with `dplyr::filter`
+
+```{r}
+#| error: true
+
+
+df |> filter(.data > 0)
+```
+
+List object cannot be coerced to type double?
+But the column .data is already a double.
+
+It took me a while to workout what was going on, but eventually I remembered that `.data` is a pronoun in tidyverse (see `?rlang:::.data`), used mainly when writing functions using tidyverse.
+Changing the column name to data fixed the problem.
+
+So what does `.data` do?
+Consider this code
+
+```{r}
+#| results: hide
+b <- "fish"
+df <- tibble(a = letters[1:3], b = 1:3)
+
+df <- df |> mutate(c = b)
+```
+
+What will column c contain?
+The values 1 to 5 from the column b or the word "fish"?
+Let's have a peek.
+
+```{r}
+df
+```
+
+It took the values from the column.
+If we wanted to be explicit, we could write
+
+```{r}
+# take b from the column
+df |> mutate(c = .data$b)
+
+# take b from the environment with the brace-brace operator
+df |> mutate(c = {{b}})
+
+# take b from the environment with the .env pronoun 
+df |> mutate(c = .env$b)
+```
+
+It also useful to use the `.data` pronoun when writing packages otherwise you get notes from R CMD check.
+
+In short, while `.data` or `.env` are legal names, they break tidyverse code, so don't call data.frame columns `.data` or `.env` if you ever want to use tidyverse functions.

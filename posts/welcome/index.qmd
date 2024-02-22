@@ -1,0 +1,18 @@
+---
+title: "Welcome to my unpublishable thoughts"
+author: "Richard J. Telford"
+date: "2024-02-20"
+categories: [news]
+---
+
+For many years, I had a [wordpress blog](https://quantpalaeo.wordpress.com/).
+
+Once I started using markdown and GitHub, I began to find the Wordpress publication process tedious.
+Pushing html to GitHub pages is so much easier than copying and pasting, then sorting out the figures in Wordpress.
+And then there were the eternal battles over how or whether `<-` would display.
+Fixing a typo could cause the code to garble itself.
+
+Some years ago, I looked into using Hugo with markdown, but it just looked like a little too much effort.
+Now I have coauthored [several books](https://biostats-r.github.io/biostats/) using Quarto, a variant of markdown, it seems natural to try a [blog using Quarto](https://quarto.org/docs/websites/website-blog.html).
+
+At least initially there won't be a comment section, but I'll explore options later.

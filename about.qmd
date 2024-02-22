@@ -1,0 +1,29 @@
+---
+title: "Richard J. Telford"
+image: profile.jpeg
+about:
+  template: trestles
+  image-shape: rounded
+  links:
+    - icon: twitter
+      text: Twitter
+      href: https://twitter.com/richardjtelford
+    - icon: cloud-slash
+      text: Bluesky
+      href: https://bsky.app/profile/richardjtelford.bsky.social
+    - icon: github
+      text: Github
+      href: https://github.com/richardjtelford
+---
+
+I’m an ecologist with interests in quantitative methods and palaeoenvironments.
+I work at the University of Bergen, Norway, in the [Ecological and Environmental Change Research Group](http://www.uib.no/rg/EECRG/ "Ecological and Environmental Change Research Group"), and am affiliated to the [Bjerknes Centre for Climate Change](http://www.bjerknes.uib.no/?lang=2).
+
+My publication list is available from [Google Scholar](http://scholar.google.no/citations?user=XoVtEAYAAAAJ "Google Scholar") and [ORCID](http://orcid.org/0000-0001-9826-3076).
+
+------------------------------------------------------------------------
+
+#### Disclaimer
+
+Opinions on this blog are mine, and do not reflect that of the Department of Biological Sciences, University of Bergen or the Bjerknes Centre.
+Any code presented on this blog is without any guarantee, and analyses may not be appropriate for your data.

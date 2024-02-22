@@ -1,0 +1,13 @@
+---
+title: "Unpublishable thoughts of a palaeoecologist"
+listing:
+  contents: posts
+  sort: "date desc"
+  type: default
+  categories: true
+  sort-ui: false
+  filter-ui: false
+  date-format: "D MMM YYYY"
+page-layout: full
+title-block-banner: true
+---

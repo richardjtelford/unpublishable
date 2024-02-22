@@ -1,0 +1,80 @@
+---
+title: "Interactions in R formulas"
+author: "Richard J. Telford"
+date: "2024-02-22"
+categories: [R]
+---
+
+I happened across a tweet yesterday criticizing a paper
+
+{{< tweet user=jfeldman_epi id=1760032277562577346 >}}
+
+Now, while I don't have a clue what a DiD model is, I do know how to code a interaction in R and that last model most definitely has a interaction.
+
+From the interactions with my response, it seems that many people don't know all the ways an interaction can be specified in regression models in R.
+
+There are three ways include an interaction in a formula. 
+
+```{r}
+library(palmerpenguins)
+
+# interaction specified explicitly with :
+lm(body_mass_g ~ sex + year + sex:year, data = penguins)
+
+# shortcut with * that expands to give the same model
+lm(body_mass_g ~ sex * year, data = penguins)
+
+# shortcut with ^2 that expands to give the same model
+lm(body_mass_g ~ (sex + year)^2, data = penguins)
+```
+
+If you compare the coefficients from the three models, you will see that they are identical.
+
+Since all three ways of coding the interaction give exactly the same result, surely one or two of these forms are redundant.
+
+Well no. Consider a slightly more complex model where we add an extra prediction and its two - way interactions with the other variables. 
+
+
+```{r}
+# With :
+lm(body_mass_g ~ sex + year + island + sex:year + sex:island + year:island, data = penguins)
+```
+
+Use the explicit style if you really like typing. With more than a few variables and their interactions this becomes unmanageable.
+
+
+```{r}
+# With *
+lm(body_mass_g ~ sex * year * island, data = penguins)
+```
+
+Whoops, that went wrong. It included the three-way interaction as well. We need to remove those by subtracting it in the formula.
+
+
+```{r}
+# With *, two way only
+lm(body_mass_g ~ sex * year * island - sex:year:island, data = penguins)
+```
+
+That's better. If we had many variables with their interactions, subtracting all the four, five or six way interactions would be really tedious.
+
+Fortunately the last style just works.
+
+```{r}
+lm(body_mass_g ~ (sex + year + island)^2, data = penguins)
+```
+
+Concise and it gives us just what we want. If we did want the three way interactions, just replace `^2` with `^3`.
+
+```{r}
+lm(body_mass_g ~ (sex + year + island)^3, data = penguins)
+```
+
+This style is particularly useful if we want to include all available variables with the `.` shortcut. This might be the first step of a backwards selection.
+
+```{r}
+lm(body_mass_g ~ .^2, data = penguins)
+```
+
+
+I think all the styles of specifying interactions are useful. If you don't, blame [Wilkerson and Rogers (1973)](https://www.jstor.org/stable/2346786).
