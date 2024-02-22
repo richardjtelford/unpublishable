@@ -77,4 +77,16 @@ lm(body_mass_g ~ .^2, data = penguins)
 ```
 
 
+If you want to use a quadratic (or higher power) term in your model, you need to protect it with `I()`.
+
+```{r}
+lm(body_mass_g ~ year + I(year ^ 2 ), data = penguins)
+```
+
+but you may be better off using `poly()` which constructs orthogonal polynomials.
+
+```{r}
+lm(body_mass_g ~ poly(year, 2), data = penguins)
+```
+
 I think all the styles of specifying interactions are useful. If you don't, blame [Wilkerson and Rogers (1973)](https://www.jstor.org/stable/2346786).
