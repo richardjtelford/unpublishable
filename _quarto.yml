@@ -4,6 +4,8 @@ project:
 
 website:
   title: "unpublishable"
+  site-url: https://richardjtelford.github.io/unpublishable/
+  description: "Unpublishable thoughts from a palaeoecologist"
   navbar:
     right:
       - about.qmd
@@ -13,6 +15,8 @@ website:
         href: https://twitter.com/richardjtelford
       - icon: cloud-slash
         href: https://bsky.app/profile/richardjtelford.bsky.social
+      - icon: rss
+        href: index.xml
 
 
 format:
