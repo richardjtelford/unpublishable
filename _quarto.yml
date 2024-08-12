@@ -27,8 +27,8 @@ format:
       caption: none
     highlight-style: a11y
     theme: 
-      light: [flatly]
-      dark: [darkly]
+      light: [flatly, callout.scss]
+      dark: [darkly, callout.scss]
     code-link: true
 
 execute: 

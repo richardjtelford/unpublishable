@@ -1,0 +1,1131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>unpublishable</title>
+<link>https://richardjtelford.github.io/unpublishable/</link>
+<atom:link href="https://richardjtelford.github.io/unpublishable/index.xml" rel="self" type="application/rss+xml"/>
+<description>Unpublishable thoughts from a palaeoecologist</description>
+<generator>quarto-1.5.53</generator>
+<lastBuildDate>Sun, 11 Aug 2024 22:00:00 GMT</lastBuildDate>
+<item>
+  <title>Custom callouts for quarto</title>
+  <dc:creator>Richard J. Telford</dc:creator>
+  <link>https://richardjtelford.github.io/unpublishable/posts/custom-callouts/</link>
+  <description><![CDATA[ <p>Callouts are a fantastic quarto feature for highlighting part of the text.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+This is a callout
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is the body of a callout</p>
+</div>
+</div>
+<p>Callouts come in several flavours: tip, note, information, caution and warning, each with their own colour and icon.</p>
+<p>But what if you want to use a different icon? One that is more appropriate for the purpose of the callout.</p>
+<p>Andreas Haldel has <a href="https://www.andreashandel.com/posts/2023-06-13-custom-callouts-quarto/">one solution</a>. Melissa van Bussel has a <a href="https://www.youtube.com/watch?v=DDQO_3R-q74&amp;t=4s">similar one</a>. Both copy the css used to make a standard callout and modify it to make a new callout. My problem is that the markdown to create the callout is clunky.</p>
+<p>For a normal callout, we can code it like this</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1">::: callout-note</span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">## header of note</span></span>
+<span id="cb1-3"></span>
+<span id="cb1-4">Body of note</span>
+<span id="cb1-5">:::</span></code></pre></div>
+</div>
+<p>Andrea’s solution requires something like this</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1">:::{.goals}</span>
+<span id="cb2-2">::::{.goals-header}</span>
+<span id="cb2-3">Learning Goals</span>
+<span id="cb2-4">::::</span>
+<span id="cb2-5">::::{.goals-container}</span>
+<span id="cb2-6"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">* </span>Know how to make your own callouts.</span>
+<span id="cb2-7"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">* </span>Be able to mess with some SCSS/CSS styling.</span>
+<span id="cb2-8">::::</span>
+<span id="cb2-9">:::</span></code></pre></div>
+</div>
+<p>I want to be able to use the original markdown.</p>
+<p>The best solution would be to rewrite the lua filters that make the callout for quarto to accept new types of callout. I have not the foggiest idea how to do that, so I’m going to propose a much easier hack solution.</p>
+<p>The question I’m asking myself is - do I really need caution and warning callouts? If I don’t, can I recycle the one of these into a custom callout?</p>
+<p>The CSS that makes the callout is available on <a href="https://github.com/quarto-dev/quarto-cli/blob/main/src/resources/formats/html/styles-callout.html">github</a> (I am focusing on html callouts because I do all my work with callouts in html).</p>
+<p>This is all the CSS specific to caution-flavoured callouts.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1">div.callout-caution {</span>
+<span id="cb3-2">  border-left-color: #fd7e14 !important;</span>
+<span id="cb3-3">}</span>
+<span id="cb3-4"></span>
+<span id="cb3-5">div.callout-caution .callout-icon::before {</span>
+<span id="cb3-6">  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAACV0lEQVRYCdVWzWoUQRCuqp2ICBLJXgITZL1EfQDBW/bkzUMUD7klD+ATSHBEfAIfQO+iXsWDxJsHL96EHAwhgzlkg8nBg25XWb0zIb0zs9muYYWkoKeru+vn664fBqElyZNuyh167NXJ8Ut8McjbmEraKHkd7uAnAFku+VWdb3reSmRV8PKSLfZ0Gjn3a6Xlcq9YGb6tADjn+lUfTXtVmaZ1KwBIvFI11rRXlWlatwIAAv2asaa9mlB9wwygiDX26qaw1yYPzFXg2N1GgG0FMF8Oj+VIx7E/03lHx8UhvYyNZLN7BwSPgekXXLribw7w5/c8EF+DBK5idvDVYtEEwMeYefjjLAdEyQ3M9nfOkgnPTEkYU+sxMq0BxNR6jExrAI31H1rzvLEfRIdgcv1XEdj6QTQAS2wtstEALLG1yEZ3QhH6oDX7ExBSFEkFINXH98NTrme5IOaaA7kIfiu2L8A3qhH9zRbukdCqdsA98TdElyeMe5BI8Rs2xHRIsoTSSVFfCFCWGPn9XHb4cdobRIWABNf0add9jakDjQJpJ1bTXOJXnnRXHRf+dNL1ZV1MBRCXhMbaHqGI1JkKIL7+i8uffuP6wVQAzO7+qVEbF6NbS0LJureYcWXUUhH66nLR5rYmva+2tjRFtojkM2aD76HEGAD3tPtKM309FJg5j/K682ywcWJ3PASCcycH/22u+Bh7Aa0ehM2Fu4z0SAE81HF9RkB21c5bEn4Dzw+/qNOyXr3DCTQDMBOdhi4nAgiFDGCinIa2owCEChUwD8qzd03PG+qdW/4fDzjUMcE1ZpIAAAAASUVORK5CYII=');</span>
+<span id="cb3-7">}</span>
+<span id="cb3-8"></span>
+<span id="cb3-9">div.callout-caution.callout-style-default .callout-title {</span>
+<span id="cb3-10">  background-color: #ffe5d0</span>
+<span id="cb3-11">}</span></code></pre></div>
+</div>
+<p>The first sets the colour of the left border of a callout. The second sets the icon. And the third is supposed to set the background colour of the callout header, but doesn’t seem to do anything.</p>
+<p>The default icon for a caution callout is a traffic cone. To change it to an icon I downloaded from <a href="https://fontawesome.com/icons/">fontawesome</a>, I add this css. You can pick the colour when you download it, or edit the svg file to have any colour you choose.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode css code-with-copy"><code class="sourceCode css"><span id="cb4-1">div<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">.callout-caution</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">.callout-icon</span><span class="in" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::before</span> {</span>
+<span id="cb4-2">  <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">background-image</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">:</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">url(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"magnifying-glass-solid.svg"</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">)</span> <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">!important</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-3">}</span></code></pre></div>
+<style type="text/css">
+div.callout-caution .callout-icon::before {
+  background-image: url("magnifying-glass-solid.svg") !important;
+}
+</style>
+</div>
+<p>It is important to add <code>!important</code> so that this CSS is used instead of the default.</p>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Magnifying glass
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This callout would have an orange header and sidebar were it not the changes made below.</p>
+</div>
+</div>
+<p>The css can directly into the document (in which case you should set <code>\| echo: false</code> to stop it printing). But is probably best in a css or scss file which can be called from the yaml using the css and theme keys respectively.</p>
+<p>But what if you don’t like the colour. The obvious thing is to change the CSS for the colours.</p>
+<div class="sourceCode" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><span class="in" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">```{css}</span></span>
+<span id="cb5-2"><span class="in" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">div.callout-caution {</span></span>
+<span id="cb5-3"><span class="in" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">  border-left-color: #0d7e14 !important;</span></span>
+<span id="cb5-4"><span class="in" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span></span>
+<span id="cb5-5"></span>
+<span id="cb5-6"></span>
+<span id="cb5-7"><span class="in" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">div.callout-caution.callout-style-default .callout-title {</span></span>
+<span id="cb5-8"><span class="in" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">  background-color: #0fe5d0 !important;</span></span>
+<span id="cb5-9"><span class="in" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span></span>
+<span id="cb5-10"><span class="in" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">```</span></span></code></pre></div>
+<p>Alas, this only changes the sidebar colour. I don’t understand why.</p>
+<p>Fortunately, there is another way. We can make a scss file and change the callout colour there. We can also add the icon.</p>
+<p>The lines about scss:defaults and scss:rules are important!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode scss code-with-copy"><code class="sourceCode scss"><span id="cb6-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/*-- scss:defaults --*/</span></span>
+<span id="cb6-2"><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">$callout-color-caution</span>: <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">#0a0ffb</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb6-3"></span>
+<span id="cb6-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/*-- scss:rules --*/</span></span>
+<span id="cb6-5"></span>
+<span id="cb6-6">div<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">.callout-caution</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">.callout-icon</span><span class="in" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::before</span> {</span>
+<span id="cb6-7">  <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">background-image</span>: <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">url(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'magnifying-glass-solid.svg'</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">)</span> <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">!important</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb6-8">}</span></code></pre></div>
+<style type="text/css">
+div.callout-caution .callout-icon::before{background-image:url("magnifying-glass-solid.svg") !important}
+</style>
+</div>
+<p>We can use this scss file by adding it to the yaml</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb7-1"><span class="pp" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">---</span></span>
+<span id="cb7-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> callout.scss</span></span>
+<span id="cb7-3"><span class="pp" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">---</span></span></code></pre></div>
+</div>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Magnifying glass
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A callout with our choice of colour and icon.</p>
+</div>
+</div>
+<p>One challenge is making sure that the icon is in the correct directory. A solution to this is to <a href="https://yoksel.github.io/url-encoder/">encode</a> the svg file and add it as data:image as in the original css.</p>
+<p>So now my scss file looks like</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode scss code-with-copy"><code class="sourceCode scss"><span id="cb8-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/*-- scss:defaults --*/</span></span>
+<span id="cb8-2"><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">$callout-color-caution</span>: <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">#0a0ffb</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb8-3"></span>
+<span id="cb8-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/*-- scss:rules --*/</span></span>
+<span id="cb8-5">div<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">.callout-caution</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">.callout-icon</span><span class="in" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::before</span> {</span>
+<span id="cb8-6">   <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">background-image</span>: <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">url(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3C!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--%3E%3Cpath fill='%230a0ffb' d='M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z'/%3E%3C/svg%3E"</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">)</span> <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">!important</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb8-7">}</span></code></pre></div>
+<style type="text/css">
+div.callout-caution .callout-icon::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3C!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--%3E%3Cpath fill='%230a0ffb' d='M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z'/%3E%3C/svg%3E") !important}
+</style>
+</div>
+
+
+<!-- -->
+
+
+ ]]></description>
+  <category>quarto</category>
+  <guid>https://richardjtelford.github.io/unpublishable/posts/custom-callouts/</guid>
+  <pubDate>Sun, 11 Aug 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Interactions in R formulas</title>
+  <dc:creator>Richard J. Telford</dc:creator>
+  <link>https://richardjtelford.github.io/unpublishable/posts/formula-R/</link>
+  <description><![CDATA[ <p>I happened across a tweet yesterday criticizing a paper</p>
+<p></p>
+<div id="tweet-10480"></div>
+<script>tweet={"url":"https:\/\/twitter.com\/jfeldman_epi\/status\/1760032277562577346","author_name":"Justin Feldman","author_url":"https:\/\/twitter.com\/jfeldman_epi","html":"\u003Cblockquote class=\"twitter-tweet\" align=\"center\"\u003E\u003Cp lang=\"en\" dir=\"ltr\"\u003EA new study in \u003Ca href=\"https:\/\/twitter.com\/PNASNews?ref_src=twsrc%5Etfw\"\u003E@PNASNews\u003C\/a\u003E claims to provide evidence that covid vaccine mandates reduced covid booster and flu vaccine uptake. They provide the replication code for the DiD models, but... these are not DiD models and that is not an interaction term.\u003Ca href=\"https:\/\/t.co\/h1M7zbGvxL\"\u003Ehttps:\/\/t.co\/h1M7zbGvxL\u003C\/a\u003E \u003Ca href=\"https:\/\/t.co\/AAQzRwETgW\"\u003Epic.twitter.com\/AAQzRwETgW\u003C\/a\u003E\u003C\/p\u003E&mdash; Justin Feldman (@jfeldman_epi) \u003Ca href=\"https:\/\/twitter.com\/jfeldman_epi\/status\/1760032277562577346?ref_src=twsrc%5Etfw\"\u003EFebruary 20, 2024\u003C\/a\u003E\u003C\/blockquote\u003E\n\u003Cscript async src=\"https:\/\/platform.twitter.com\/widgets.js\" charset=\"utf-8\"\u003E\u003C\/script\u003E\n\n","width":550,"height":null,"type":"rich","cache_age":"3153600000","provider_name":"Twitter","provider_url":"https:\/\/twitter.com","version":"1.0"};document.getElementById("tweet-10480").innerHTML = tweet["html"];</script><p>Now, while I don’t have a clue what a DiD model is, I do know how to code a interaction in R and that last model most definitely has a interaction.</p>
+<p>From the interactions with my response, it seems that many people don’t know all the ways an interaction can be specified in regression models in R.</p>
+<p>There are three ways include an interaction in a formula.</p>
+<div class="cell">
+<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;"><a href="https://allisonhorst.github.io/palmerpenguins/">palmerpenguins</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span></span>
+<span><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># interaction specified explicitly with :</span></span>
+<span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">body_mass_g</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">sex</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">year</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">sex</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">year</span>, data <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">penguins</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = body_mass_g ~ sex + year + sex:year, data = penguins)
+
+Coefficients:
+ (Intercept)       sexmale          year  sexmale:year  
+  -47659.868     15834.832        25.658        -7.545  </code></pre>
+</div>
+<div class="sourceCode" id="cb3" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># shortcut with * that expands to give the same model</span></span>
+<span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">body_mass_g</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">sex</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">year</span>, data <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">penguins</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = body_mass_g ~ sex * year, data = penguins)
+
+Coefficients:
+ (Intercept)       sexmale          year  sexmale:year  
+  -47659.868     15834.832        25.658        -7.545  </code></pre>
+</div>
+<div class="sourceCode" id="cb5" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># shortcut with ^2 that expands to give the same model</span></span>
+<span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">body_mass_g</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">sex</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">year</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, data <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">penguins</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = body_mass_g ~ (sex + year)^2, data = penguins)
+
+Coefficients:
+ (Intercept)       sexmale          year  sexmale:year  
+  -47659.868     15834.832        25.658        -7.545  </code></pre>
+</div>
+</div>
+<p>If you compare the coefficients from the three models, you will see that they are identical.</p>
+<p>Since all three ways of coding the interaction give exactly the same result, surely one or two of these forms are redundant.</p>
+<p>Well no. Consider a slightly more complex model where we add an extra prediction and its two - way interactions with the other variables.</p>
+<div class="cell">
+<div class="sourceCode" id="cb7" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># With :</span></span>
+<span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">body_mass_g</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">sex</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">year</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">island</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">sex</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">year</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">sex</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">island</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">year</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">island</span>, data <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">penguins</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = body_mass_g ~ sex + year + island + sex:year + sex:island + 
+    year:island, data = penguins)
+
+Coefficients:
+            (Intercept)                  sexmale                     year  
+              -67269.07                 33226.17                    35.65  
+            islandDream          islandTorgersen             sexmale:year  
+               56299.88                378330.62                   -16.16  
+    sexmale:islandDream  sexmale:islandTorgersen         year:islandDream  
+                -245.98                  -140.30                   -28.47  
+   year:islandTorgersen  
+                -188.87  </code></pre>
+</div>
+</div>
+<p>Use the explicit style if you really like typing. With more than a few variables and their interactions this becomes unmanageable.</p>
+<div class="cell">
+<div class="sourceCode" id="cb9" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># With *</span></span>
+<span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">body_mass_g</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">sex</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">year</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">island</span>, data <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">penguins</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = body_mass_g ~ sex * year * island, data = penguins)
+
+Coefficients:
+                 (Intercept)                       sexmale  
+                   -70977.42                      40494.12  
+                        year                   islandDream  
+                       37.50                      73282.82  
+             islandTorgersen                  sexmale:year  
+                   356748.26                        -19.77  
+         sexmale:islandDream       sexmale:islandTorgersen  
+                   -33772.66                      44938.25  
+            year:islandDream          year:islandTorgersen  
+                      -36.93                       -178.12  
+    sexmale:year:islandDream  sexmale:year:islandTorgersen  
+                       16.70                        -22.45  </code></pre>
+</div>
+</div>
+<p>Whoops, that went wrong. It included the three-way interaction as well. We need to remove those by subtracting it in the formula.</p>
+<div class="cell">
+<div class="sourceCode" id="cb11" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># With *, two way only</span></span>
+<span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">body_mass_g</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">sex</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">year</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">island</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">sex</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">year</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">island</span>, data <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">penguins</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = body_mass_g ~ sex * year * island - sex:year:island, 
+    data = penguins)
+
+Coefficients:
+            (Intercept)                  sexmale                     year  
+              -67269.07                 33226.17                    35.65  
+            islandDream          islandTorgersen             sexmale:year  
+               56299.88                378330.62                   -16.16  
+    sexmale:islandDream  sexmale:islandTorgersen         year:islandDream  
+                -245.98                  -140.30                   -28.47  
+   year:islandTorgersen  
+                -188.87  </code></pre>
+</div>
+</div>
+<p>That’s better. If we had many variables with their interactions, subtracting all the four, five or six way interactions would be really tedious.</p>
+<p>Fortunately the last style just works.</p>
+<div class="cell">
+<div class="sourceCode" id="cb13" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">body_mass_g</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">sex</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">year</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">island</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, data <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">penguins</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = body_mass_g ~ (sex + year + island)^2, data = penguins)
+
+Coefficients:
+            (Intercept)                  sexmale                     year  
+              -67269.07                 33226.17                    35.65  
+            islandDream          islandTorgersen             sexmale:year  
+               56299.88                378330.62                   -16.16  
+    sexmale:islandDream  sexmale:islandTorgersen         year:islandDream  
+                -245.98                  -140.30                   -28.47  
+   year:islandTorgersen  
+                -188.87  </code></pre>
+</div>
+</div>
+<p>Concise and it gives us just what we want. If we did want the three way interactions, just replace <code>^2</code> with <code>^3</code>.</p>
+<div class="cell">
+<div class="sourceCode" id="cb15" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">body_mass_g</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">sex</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">year</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">island</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, data <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">penguins</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = body_mass_g ~ (sex + year + island)^3, data = penguins)
+
+Coefficients:
+                 (Intercept)                       sexmale  
+                   -70977.42                      40494.12  
+                        year                   islandDream  
+                       37.50                      73282.82  
+             islandTorgersen                  sexmale:year  
+                   356748.26                        -19.77  
+         sexmale:islandDream       sexmale:islandTorgersen  
+                   -33772.66                      44938.25  
+            year:islandDream          year:islandTorgersen  
+                      -36.93                       -178.12  
+    sexmale:year:islandDream  sexmale:year:islandTorgersen  
+                       16.70                        -22.45  </code></pre>
+</div>
+</div>
+<p>This style is particularly useful if we want to include all available variables with the <code>.</code> shortcut. This might be the first step of a backwards selection.</p>
+<div class="cell">
+<div class="sourceCode" id="cb17" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">body_mass_g</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">.</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, data <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">penguins</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = body_mass_g ~ .^2, data = penguins)
+
+Coefficients:
+                       (Intercept)                    speciesChinstrap  
+                        -8.482e+04                           2.520e+04  
+                     speciesGentoo                         islandDream  
+                        -2.695e+05                          -1.123e+04  
+                   islandTorgersen                      bill_length_mm  
+                         4.362e+05                           5.100e+02  
+                     bill_depth_mm                   flipper_length_mm  
+                        -4.756e+04                           4.782e+03  
+                           sexmale                                year  
+                         2.192e+05                           3.374e+01  
+      speciesChinstrap:islandDream           speciesGentoo:islandDream  
+                                NA                                  NA  
+  speciesChinstrap:islandTorgersen       speciesGentoo:islandTorgersen  
+                                NA                                  NA  
+   speciesChinstrap:bill_length_mm        speciesGentoo:bill_length_mm  
+                         1.814e+01                           2.715e+01  
+    speciesChinstrap:bill_depth_mm         speciesGentoo:bill_depth_mm  
+                         5.110e+01                           7.262e+00  
+speciesChinstrap:flipper_length_mm     speciesGentoo:flipper_length_mm  
+                         3.246e+01                           4.318e+00  
+          speciesChinstrap:sexmale               speciesGentoo:sexmale  
+                        -9.754e+02                          -8.683e+02  
+             speciesChinstrap:year                  speciesGentoo:year  
+                        -1.640e+01                           1.337e+02  
+        islandDream:bill_length_mm      islandTorgersen:bill_length_mm  
+                        -2.722e+01                          -3.077e+01  
+         islandDream:bill_depth_mm       islandTorgersen:bill_depth_mm  
+                        -5.704e+01                          -1.662e+02  
+     islandDream:flipper_length_mm   islandTorgersen:flipper_length_mm  
+                        -1.438e+01                          -8.442e+00  
+               islandDream:sexmale             islandTorgersen:sexmale  
+                         2.136e+02                           2.736e+02  
+                  islandDream:year                islandTorgersen:year  
+                         7.933e+00                          -2.144e+02  
+      bill_length_mm:bill_depth_mm    bill_length_mm:flipper_length_mm  
+                        -2.581e+00                          -1.642e+00  
+            bill_length_mm:sexmale                 bill_length_mm:year  
+                         2.904e+01                          -6.497e-02  
+   bill_depth_mm:flipper_length_mm               bill_depth_mm:sexmale  
+                        -2.579e-02                          -7.168e+01  
+                bill_depth_mm:year           flipper_length_mm:sexmale  
+                         2.381e+01                           1.684e+01  
+            flipper_length_mm:year                        sexmale:year  
+                        -2.341e+00                          -1.105e+02  </code></pre>
+</div>
+</div>
+<p>I think all the styles of specifying interactions are useful. If you don’t, blame <a href="https://www.jstor.org/stable/2346786">Wilkerson and Rogers (1973)</a>.</p>
+
+
+<!-- -->
+
+
+ ]]></description>
+  <category>R</category>
+  <guid>https://richardjtelford.github.io/unpublishable/posts/formula-R/</guid>
+  <pubDate>Wed, 21 Feb 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>.data: an unfortunate name for a column</title>
+  <dc:creator>Richard J. Telford</dc:creator>
+  <link>https://richardjtelford.github.io/unpublishable/posts/unfortunate-column-name/</link>
+  <description><![CDATA[ <p>A colleague came to ask for help today with some code that worked perfectly when run with base R, but failed with an impenetrable error when run through tidyverse.</p>
+<p>Here is a minimal example of the set up, a tibble with a column called .data</p>
+<div class="cell">
+<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span></span>
+<span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">df</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>a <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">LETTERS</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">[</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">]</span>, .data <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">df</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 2
+  a      .data
+  &lt;chr&gt;  &lt;dbl&gt;
+1 A     -0.700
+2 B      0.892
+3 C      1.50 
+4 D      0.731
+5 E     -0.440</code></pre>
+</div>
+</div>
+<p>.data is a legal name for a column according to R’s rules for naming objects, and everything appears to be fine.</p>
+<p>What could possibly go wrong? Let’s try filtering the column .data to keep just the positive values, first with base R.</p>
+<div class="cell">
+<div class="sourceCode" id="cb3" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">df</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">[</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">df</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">.data</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">]</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  a     .data
+  &lt;chr&gt; &lt;dbl&gt;
+1 B     0.892
+2 C     1.50 
+3 D     0.731</code></pre>
+</div>
+</div>
+<p>Perfect. And now with <code><a href="https://dplyr.tidyverse.org/reference/filter.html">dplyr::filter</a></code></p>
+<div class="cell">
+<div class="sourceCode" id="cb5" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">df</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">.data</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>Error in `filter()`:
+ℹ In argument: `.data &gt; 0`.
+Caused by error:
+! 'list' object cannot be coerced to type 'double'</code></pre>
+</div>
+</div>
+<p>List object cannot be coerced to type double? But the column .data is already a double.</p>
+<p>It took me a while to workout what was going on, but eventually I remembered that <code>.data</code> is a pronoun in tidyverse (see <code>?rlang:::.data</code>), used mainly when writing functions using tidyverse. Changing the column name to data fixed the problem.</p>
+<p>So what does <code>.data</code> do? Consider this code</p>
+<div class="cell">
+<div class="sourceCode" id="cb7" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">b</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"fish"</span></span>
+<span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">df</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>a <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">letters</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">[</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">]</span>, b <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span></span>
+<span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">df</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">df</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>c <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">b</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div>
+</div>
+<p>What will column c contain? The values 1 to 5 from the column b or the word “fish”? Let’s have a peek.</p>
+<div class="cell">
+<div class="sourceCode" id="cb8" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">df</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  a         b     c
+  &lt;chr&gt; &lt;int&gt; &lt;int&gt;
+1 a         1     1
+2 b         2     2
+3 c         3     3</code></pre>
+</div>
+</div>
+<p>It took the values from the column. If we wanted to be explicit, we could write</p>
+<div class="cell">
+<div class="sourceCode" id="cb10" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># take b from the column</span></span>
+<span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">df</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>c <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">.data</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">b</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  a         b     c
+  &lt;chr&gt; &lt;int&gt; &lt;int&gt;
+1 a         1     1
+2 b         2     2
+3 c         3     3</code></pre>
+</div>
+<div class="sourceCode" id="cb12" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># take b from the environment with the brace-brace operator</span></span>
+<span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">df</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>c <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">b</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  a         b c    
+  &lt;chr&gt; &lt;int&gt; &lt;chr&gt;
+1 a         1 fish 
+2 b         2 fish 
+3 c         3 fish </code></pre>
+</div>
+<div class="sourceCode" id="cb14" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># take b from the environment with the .env pronoun </span></span>
+<span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">df</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>c <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">.env</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">b</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  a         b c    
+  &lt;chr&gt; &lt;int&gt; &lt;chr&gt;
+1 a         1 fish 
+2 b         2 fish 
+3 c         3 fish </code></pre>
+</div>
+</div>
+<p>It also useful to use the <code>.data</code> pronoun when writing packages otherwise you get notes from R CMD check.</p>
+<p>In short, while <code>.data</code> or <code>.env</code> are legal names, they break tidyverse code, so don’t call data.frame columns <code>.data</code> or <code>.env</code> if you ever want to use tidyverse functions.</p>
+
+
+<!-- -->
+
+
+ ]]></description>
+  <category>R</category>
+  <category>tidyverse</category>
+  <guid>https://richardjtelford.github.io/unpublishable/posts/unfortunate-column-name/</guid>
+  <pubDate>Tue, 20 Feb 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Welcome to my unpublishable thoughts</title>
+  <dc:creator>Richard J. Telford</dc:creator>
+  <link>https://richardjtelford.github.io/unpublishable/posts/welcome/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>For many years, I had a <a href="https://quantpalaeo.wordpress.com/">wordpress blog</a>.</p>
+<p>Once I started using markdown and GitHub, I began to find the Wordpress publication process tedious. Pushing html to GitHub pages is so much easier than copying and pasting, then sorting out the figures in Wordpress. And then there were the eternal battles over how or whether <code>&lt;-</code> would display. Fixing a typo could cause the code to garble itself.</p>
+<p>Some years ago, I looked into using Hugo with markdown, but it just looked like a little too much effort. Now I have coauthored <a href="https://biostats-r.github.io/biostats/">several books</a> using Quarto, a variant of markdown, it seems natural to try a <a href="https://quarto.org/docs/websites/website-blog.html">blog using Quarto</a>.</p>
+<p>At least initially there won’t be a comment section, but I’ll explore options later.</p>
+
+
+<!-- -->
+
+
+ ]]></description>
+  <category>news</category>
+  <guid>https://richardjtelford.github.io/unpublishable/posts/welcome/</guid>
+  <pubDate>Mon, 19 Feb 2024 23:00:00 GMT</pubDate>
+</item>
+</channel>
+</rss>

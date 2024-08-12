@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/custom-callouts/index.html",
       "/posts/formula-R/index.html",
       "/posts/unfortunate-column-name/index.html",
       "/posts/welcome/index.html"
